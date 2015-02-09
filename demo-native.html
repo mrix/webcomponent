@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="import" href="registration-form.html">
+</head>
+<body>
+    <registration-form
+            id="first-form"
+            firstname="Alexandr"
+            lastname="Evtushenko"
+            email="aevtushenko@xiag.ch"
+            password="123"></registration-form>
+    <script>
+        var form = document.getElementById('first-form');
+        form.addEventListener('done', function(e) {
+            alert(JSON.stringify(e.data.data));
+        });
+    </script>
+</body>
+</html>
