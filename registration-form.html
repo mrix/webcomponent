@@ -1,0 +1,192 @@
+<template id="registration-form-step-1">
+    <div class="form-step form-step-1">
+        <form>
+            <div>
+                <label>First Name</label>
+                <input type="text" class="firstname" required />
+            </div>
+            <div>
+                <label>Last Name</label>
+                <input type="text" class="lastname" required />
+            </div>
+            <div>
+                <button type="submit" class="next">Next</button>
+            </div>
+        </form>
+    </div>
+</template>
+
+<template id="registration-form-step-2">
+    <div class="form-step form-step-2">
+        <form>
+            <div>
+                <label>Email</label>
+                <input type="email" class="email" required />
+            </div>
+            <div>
+                <label>Password</label>
+                <input type="password" class="password" required />
+            </div>
+            <div>
+                <button type="submit" class="next">Next</button>
+                <button type="button" class="prev">Prev</button>
+            </div>
+        </form>
+    </div>
+</template>
+
+<template id="registration-form-step-3">
+    <div class="form-step form-step-3">
+        <form>
+            <div>
+                Click "next"
+            </div>
+            <div>
+                <button type="submit" class="next">Next</button>
+                <button type="button" class="prev">Prev</button>
+            </div>
+        </form>
+    </div>
+</template>
+
+<template id="registration-form-step-4">
+    <div class="form-step form-step-4">
+        <h2>Done!</h2>
+    </div>
+</template>
+
+<script>
+    var ownerDocument = document.currentScript.ownerDocument;
+
+    var triggerEvent = function(element, type, data) {
+        var event;
+
+        if (document.createEvent) {
+            event = document.createEvent("HTMLEvents");
+            event.initEvent(type, true, true);
+        } else {
+            event = document.createEventObject();
+            event.eventType = type;
+        }
+
+        event.eventName = type;
+        event.data = data;
+
+        if (document.createEvent) {
+            element.dispatchEvent(event);
+        } else {
+            element.fireEvent("on" + event.eventType, event);
+        }
+    };
+
+    var prototype = Object.create(HTMLElement.prototype);
+
+    prototype.applyDataToForm = function() {
+        this.attrs.forEach(function(attr) {
+            var input = this.shadowRoot.querySelector('.' + attr);
+            if (input) {
+                input.value = this.data[attr];
+            }
+        }, this);
+    };
+    prototype.applyFormToData = function() {
+        this.attrs.forEach(function(attr) {
+            var input = this.shadowRoot.querySelector('.' + attr);
+            if (input) {
+                this.data[attr] = input.value;
+            }
+        }, this);
+    };
+    prototype.renderTemplate = function(stepNo) {
+        while (this.shadowRoot.firstChild) {
+            this.shadowRoot.removeChild(this.shadowRoot.firstChild);
+        }
+
+        var template = ownerDocument.querySelector('#registration-form-step-' + stepNo);
+        this.shadowRoot.appendChild(template.content.cloneNode(true));
+    };
+    prototype.showStep = function(stepNo) {
+        this.renderTemplate(stepNo);
+        this.applyDataToForm(stepNo);
+
+        triggerEvent(this, 'step', {
+            step: stepNo,
+            data: this.data
+        });
+
+        if (stepNo < 4) {
+            var form = this.shadowRoot.querySelector('form');
+            if (form) {
+                form.onsubmit = function() {
+                    this.applyFormToData(stepNo);
+
+                    triggerEvent(this, 'next', {
+                        step: stepNo,
+                        data: this.data
+                    });
+                    this.showStep(stepNo + 1);
+
+                    return false;
+                }.bind(this);
+            }
+        } else {
+            triggerEvent(this, 'done', {
+                step: stepNo,
+                data: this.data
+            });
+        }
+
+        if (stepNo > 1) {
+            var prev = this.shadowRoot.querySelector('.prev');
+            if (prev) {
+                prev.onclick = function () {
+                    this.applyFormToData(stepNo);
+
+                    triggerEvent(this, 'prev', {
+                        step: stepNo,
+                        data: this.data
+                    });
+                    this.showStep(stepNo - 1);
+
+                    return false;
+                }.bind(this);
+            }
+        } else {
+            triggerEvent(this, 'first', {
+                step: stepNo,
+                data: this.data
+            });
+        }
+    };
+    prototype.createdCallback = function() {
+        this.attrs = [
+            'firstname',
+            'lastname',
+            'email',
+            'password'
+        ];
+
+        this.data = {};
+        this.attrs.forEach(function(attr) {
+            this.data[attr] = this.hasAttribute(attr) ? this.getAttribute(attr) : '';
+        }, this);
+
+        this.shadowRoot = this.createShadowRoot();
+    };
+    prototype.attachedCallback = function() {
+        this.showStep(1);
+    };
+    prototype.attributeChangedCallback = function (name, oldValue, newValue) {
+        if (this.attrs.indexOf(name) === -1) {
+            return;
+        }
+
+        this.data[name] = newValue;
+
+        var input = this.shadowRoot.querySelector('.' + name);
+        if (input) {
+            input.value = newValue;
+        }
+    };
+    ownerDocument.registerElement('registration-form', {'prototype': prototype});
+</script>
