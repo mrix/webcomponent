@@ -7,7 +7,7 @@
     <link rel="import" href="registration-form.html">
 </head>
 <body ng-controller="AppController">
-    <registration-form
+    <registration-form watch-form
             firstname="{{ firstname }}"
             lastname="{{ lastname }}"
             email="{{ email }}"
@@ -15,11 +15,22 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.12/angular.min.js"></script>
     <script>
-        angular.module('app', []).controller('AppController', function ($scope) {
+        var app = angular.module('app', []);
+        app.controller('AppController', function ($scope) {
             $scope.firstname    = 'Alexandr';
             $scope.lastname     = 'Evtushenko';
             $scope.email        = 'aevtushenko@xiag.ch';
             $scope.password     = '123';
+        });
+        app.directive('watchForm', function() {
+            return {
+                restrict: 'A',
+                link: function(scope, element) {
+                    element.bind('done', function(e) {
+                        alert("Done!\n" + JSON.stringify(e.data));
+                    });
+                }
+            };
         });
     </script>
 </body>
