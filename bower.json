@@ -1,0 +1,11 @@
+{
+  "name": "mrix-registration-form",
+  "version": "0.0.0",
+  "main": "registration-form.html",
+  "authors": [
+    "mrix"
+  ],
+  "license": "MIT",
+  "homepage": "mrix.github.io",
+  "private": true
+}
