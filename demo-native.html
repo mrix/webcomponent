@@ -13,10 +13,19 @@
             lastname="Evtushenko"
             email="aevtushenko@xiag.ch"
             password="123"></registration-form>
+
+    <registration-form
+            id="second-form"
+            firstname="Abc"
+            lastname="Def"
+            email="abc@def.ch"
+            password="456"></registration-form>
     <script>
-        var form = document.getElementById('first-form');
-        form.addEventListener('done', function(e) {
-            alert(JSON.stringify(e.data.data));
+        document.getElementById('first-form').addEventListener('done', function(e) {
+            alert("First form!\n" + JSON.stringify(e.data.data));
+        });
+        document.getElementById('second-form').addEventListener('done', function(e) {
+            alert("Second form!\n" + JSON.stringify(e.data.data));
         });
     </script>
 </body>
