@@ -27,7 +27,7 @@
                 restrict: 'A',
                 link: function(scope, element) {
                     element.bind('done', function(e) {
-                        alert("Done!\n" + JSON.stringify(e.data));
+                        alert("Done!\n" + JSON.stringify(e.data.data));
                     });
                 }
             };
